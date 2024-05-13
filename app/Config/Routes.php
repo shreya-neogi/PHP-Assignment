@@ -26,6 +26,7 @@ $routes->add('employee', 'EmployeeController::add_list');
 $routes->add('employee/(:any)', 'EmployeeController::add_list/$1');
 $routes->add('employee/(:any)/(:any)', 'EmployeeController::add_list/$1/$2');
 $routes->add('load_image/(:any)', 'EmployeeController::read_file/$1');
+$routes->add('sort_data', 'EmployeeController::sort_data');
 /*
  * --------------------------------------------------------------------
  * Route Definitions

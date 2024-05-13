@@ -6,7 +6,7 @@ class EmployeeController extends BaseController
     protected $session;
     protected $data;
     public function __construct(){
-        //$this->session= \Config\Services::session();
+        $this->session= \Config\Services::session();
     }
     public function index()
     {
@@ -14,55 +14,61 @@ class EmployeeController extends BaseController
     }
     public function add_list($type='',$id=''){
         if (strtolower(service('request')->getMethod()) === 'post') {
-            $lastId = $this->get_file_data('get_last');
-            
-            //its a post
-            $data = [
-                'id'                => $lastId+1
-                ,'employee_name'    => trim($this->request->getpost('emp_name'))
-                ,'employee_address' => trim($this->request->getpost('emp_address'))
-                ,'employee_gender'  => trim($this->request->getpost('emp_gender'))
-            ];
-            $data['employee_file'] = '';
-            $newName = '';
-            if($this->request->getFile('emp_file')){
-                $file = $this->request->getFile('emp_file');
-                if($file->getName()!=''){
-                    $newName = $file->getRandomName();
-                    $ext = $file->guessExtension();
-                    $file->move(WRITEPATH . 'uploads',$newName);
-                    $data['employee_file'] = $newName;
+           
+            if(trim($this->request->getpost('emp_name') && $this->request->getpost('emp_gender'))){
+                $lastId = $this->get_file_data('get_last');
+                //its a post
+                $data = [
+                    'id'                => $lastId+1
+                    ,'employee_name'    => trim($this->request->getpost('emp_name'))
+                    ,'employee_address' => trim($this->request->getpost('emp_address'))
+                    ,'employee_gender'  => trim($this->request->getpost('emp_gender'))
+                ];
+                $data['employee_file'] = '';
+                $newName = '';
+                if($this->request->getFile('emp_file')){
+                    $file = $this->request->getFile('emp_file');
+                    if($file->getName()!=''){
+                        $newName = $file->getRandomName();
+                        $ext = $file->guessExtension();
+                        $file->move(WRITEPATH . 'uploads',$newName);
+                        $data['employee_file'] = $newName;
+                    }
+                    
                 }
-                
-            }
-            if($this->get_file_data('all_data')!=''){
-                $all_data = $this->get_file_data('all_data');
-            }else{
-                $all_data = [];
-            }
-            
-            if(trim($this->request->getpost('emp_edid'))!=''){
-                if(isset($all_data) && !empty($all_data)){
-                    foreach($all_data as $k=>$alld){
-                        if($this->request->getpost('emp_edid') == $alld['id']){
-                            $all_data[$k] = [
-                                'id'                => $this->request->getpost('emp_edid')
-                                ,'employee_name'    => trim($this->request->getpost('emp_name'))
-                                ,'employee_address' => trim($this->request->getpost('emp_address'))
-                                ,'employee_gender'  => trim($this->request->getpost('emp_gender'))
-                            ];
-                            if($data['employee_file'] != ''){
-                                $all_data[$k]['employee_file'] = $data['employee_file'];
-                            }else{
-                                $all_data[$k]['employee_file'] = $alld['employee_file'];
+                if($this->get_file_data('all_data')!=''){
+                    $all_data = $this->get_file_data('all_data');
+                }else{
+                    $all_data = [];
+                }
+
+                if(trim($this->request->getpost('emp_edid'))!=''){
+                    if(isset($all_data) && !empty($all_data)){
+                        foreach($all_data as $k=>$alld){
+                            if($this->request->getpost('emp_edid') == $alld['id']){
+                                $all_data[$k] = [
+                                    'id'                => $this->request->getpost('emp_edid')
+                                    ,'employee_name'    => trim($this->request->getpost('emp_name'))
+                                    ,'employee_address' => trim($this->request->getpost('emp_address'))
+                                    ,'employee_gender'  => trim($this->request->getpost('emp_gender'))
+                                ];
+                                if($data['employee_file'] != ''){
+                                    $all_data[$k]['employee_file'] = $data['employee_file'];
+                                }else{
+                                    $all_data[$k]['employee_file'] = $alld['employee_file'];
+                                }
                             }
                         }
                     }
+                }else{
+                    $all_data[]=$data;
                 }
+                $this->write_data($all_data);
             }else{
-                $all_data[]=$data;
+                $this->session->setFlashdata('message', 'please enter name and gender');
+                return redirect('employee');
             }
-            $this->write_data($all_data);
+            
             // $myfile = fopen(WRITEPATH."save_data.txt", "w") or die("Unable to open file!");
             // $txt = json_encode($all_data);
             // fwrite($myfile, $txt);
@@ -71,9 +77,11 @@ class EmployeeController extends BaseController
             return redirect('employee');
             
         }else{
+            //echo $type;exit;
             $emp_data = $this->get_file_data('all_data');
             if($id!='' && $type=='ed'){
                 $data['emp_details'] = $this->get_file_data('all_data',$id);
+                $data['emp_data'] = $emp_data;
             }elseif($id!='' && $type=='del'){
             
                 if(isset($emp_data) && !empty($emp_data)){
@@ -88,7 +96,11 @@ class EmployeeController extends BaseController
                 unset($emp_data[$unsetid]);
                 $data['emp_data'] = $emp_data;
                 $this->write_data($emp_data);
-            }else{
+            }elseif($type=='sort'){
+                $emp_data = $this->sort_data($emp_data,$id);
+                $data['emp_data'] = $emp_data;
+            }
+            else{
                 $data['emp_data'] = $emp_data;
             }
             
@@ -96,13 +108,28 @@ class EmployeeController extends BaseController
         }
         
     }
-    public function write_data($all_data){
+    public function sort_data($all_data=[],$sort_type='id_asc'){
+        
+           if(trim($sort_type) == 'id_asc'){
+            array_multisort(array_column($all_data, 'id'), SORT_ASC, $all_data);
+           }elseif (trim($sort_type) == 'id_desc') {
+            array_multisort(array_column($all_data, 'id'), SORT_DESC, $all_data);
+           }elseif (trim($sort_type) == 'employee_asc') {
+            array_multisort(array_column($all_data, 'employee_name'), SORT_ASC, $all_data);
+           }elseif (trim($sort_type) == 'employee_desc') {
+            array_multisort(array_column($all_data, 'employee_name'), SORT_DESC, $all_data);
+           }
+        
+        
+        return $all_data;
+    }
+    private function write_data($all_data){
         $myfile = fopen(WRITEPATH."save_data.txt", "w") or die("Unable to open file!");
         $txt = json_encode($all_data);
         fwrite($myfile, $txt);
         fclose($myfile);
     }
-    public function get_file_data($return_type='',$id=''){
+    private function get_file_data($return_type='',$id=''){
         $fileData = file_get_contents(WRITEPATH."save_data.txt", true);
         $fileData_array = json_decode($fileData,true);
         if($return_type=='get_last'){
