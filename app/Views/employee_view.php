@@ -7,7 +7,7 @@
 </head>
 <body>
     <div class="form_section">
-        <form action="<?=base_url('employee')?>">
+        <form action="<?=base_url('employee')?>" enctype="multipart/form-data" method="post">
             <table>
                 <tr>
                     <td>Name</td>
@@ -46,7 +46,40 @@
         </form>
     </div>
     <div class="list_section">
-
+    <?php
+        if(isset($emp_data) && !empty(($emp_data))){
+            echo '<pre>';print_r($emp_data);echo '</pre>';
+        ?>
+        <table>
+        <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Gender</th>
+            <th>Image</th>
+            <th>Action</th>
+        </tr>
+            <?php
+             foreach( $emp_data as $emp_d ){
+            ?>
+                <tr>
+                    <td><?=$emp_d['employee_name']?></td>
+                    <td><?=$emp_d['employee_address']?></td>
+                    <td><?=$emp_d['employee_gender']?></td>
+                    <td><img src="<?=(($emp_d['employee_file']!='')?base_url('load_image/'.$emp_d['employee_file']):'')?>" height="70" ></td>
+                    <td>
+                        <a href="<?=base_url('employee?edid='.$emp_d['id'])?>">edit</a>
+                        <a href="<?=base_url('employee?delid='.$emp_d['id'])?>">delete</a>
+                    </td>
+                </tr>
+            <?php
+            }
+             ?>
+        </table>
+        <?php
+        }
+        ?>
+        
+          
     </div>
 </body>
 </html>

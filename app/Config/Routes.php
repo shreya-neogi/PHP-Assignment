@@ -23,6 +23,7 @@ $routes->setTranslateURIDashes(false);
 $routes->set404Override();
 $routes->setAutoRoute(true);
 $routes->add('employee', 'EmployeeController::add_list');
+$routes->add('load_image/(:any)', 'EmployeeController::read_file/$1');
 /*
  * --------------------------------------------------------------------
  * Route Definitions
