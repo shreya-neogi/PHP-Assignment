@@ -64,6 +64,9 @@ class EmployeeController extends BaseController
                     $all_data[]=$data;
                 }
                 $this->write_data($all_data);
+                $data['emp_data'] = $this->get_file_data('all_data');
+                $this->session->setFlashdata('message', 'Data added successfully');
+                return redirect('employee');
             }else{
                 $this->session->setFlashdata('message', 'please enter name and gender');
                 return redirect('employee');
@@ -73,8 +76,7 @@ class EmployeeController extends BaseController
             // $txt = json_encode($all_data);
             // fwrite($myfile, $txt);
             // fclose($myfile);
-            $data['emp_data'] = $this->get_file_data('all_data');
-            return redirect('employee');
+            
             
         }else{
             //echo $type;exit;
