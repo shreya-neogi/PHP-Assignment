@@ -13,7 +13,7 @@
                     <td>Name</td>
                     <td>:</td>
                     <td>
-                        <input type="text" name="emp_name" id="emp_name">
+                        <input type="text" name="emp_name" id="emp_name" value="<?=((isset($emp_details['employee_name']))?$emp_details['employee_name']:'')?>">
                     </td>
                 </tr>
                 <tr>
@@ -21,24 +21,26 @@
                     <td>:</td>
                     <td>
                         <input type="file" name="emp_file" id="emp_file">
+                        <img src="<?=(($emp_details['employee_file']!='')?base_url('load_image/'.$emp_details['employee_file']):'')?>" height="70" >
                     </td>
                 </tr>
                 <tr>
                     <td>Address</td>
                     <td>:</td>
                     <td>
-                        <textarea name="emp_address" id="emp_address"></textarea>
+                        <textarea name="emp_address" id="emp_address" ><?=((isset($emp_details['employee_address']))?$emp_details['employee_address']:'')?></textarea>
                     </td>
                 </tr>
                 <tr>
                     <td>Gender</td>
                     <td>:</td>
                     <td>
-                        <textarea name="emp_gender" id="emp_gender"></textarea>
+                        <input type="text" name="emp_gender" id="emp_gender" value="<?=((isset($emp_details['employee_gender']))?$emp_details['employee_gender']:'')?>">
                     </td>
                 </tr>
                 <tr>
                     <td colspan="3">
+                    <input type="text" name="emp_edid" id="emp_edid" value="<?=((isset($emp_details['id']))?$emp_details['id']:'')?>">
                         <button type="submit">Submit</button>
                     </td>
                 </tr>
@@ -48,7 +50,7 @@
     <div class="list_section">
     <?php
         if(isset($emp_data) && !empty(($emp_data))){
-            echo '<pre>';print_r($emp_data);echo '</pre>';
+            echo '<pre>';print_r($emp_details);echo '</pre>';
         ?>
         <table>
         <tr>
@@ -67,8 +69,8 @@
                     <td><?=$emp_d['employee_gender']?></td>
                     <td><img src="<?=(($emp_d['employee_file']!='')?base_url('load_image/'.$emp_d['employee_file']):'')?>" height="70" ></td>
                     <td>
-                        <a href="<?=base_url('employee?edid='.$emp_d['id'])?>">edit</a>
-                        <a href="<?=base_url('employee?delid='.$emp_d['id'])?>">delete</a>
+                        <a href="<?=base_url('employee/ed/'.$emp_d['id'])?>">edit</a>
+                        <a href="<?=base_url('employee/del/'.$emp_d['id'])?>">delete</a>
                     </td>
                 </tr>
             <?php
