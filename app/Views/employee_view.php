@@ -176,6 +176,23 @@
                         <td>
                             <a href="<?=base_url('employee/ed/'.$emp_d['id'])?>">edit</a>
                             <a href="<?=base_url('employee/del/'.$emp_d['id'])?>">delete</a>
+                            <a href="javascript:void(0);" onclick="OpenDetais('<?=$emp_d['id']?>');">view</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <table width="100%" class="detailsemp" id="details_emp<?=$emp_d['id']?>" style="display:none;background-color:#eee;" >
+                                <tr>
+                                    <td>Name </td><td>: </td><td><?=$emp_d['employee_name']?></td>
+                                </tr>
+                                <tr>
+                                    <td>address</td><td>: </td><td><?=$emp_d['employee_address']?></td>
+                                </tr>
+                                <tr>
+                                   
+                                    <td>gender </td><td>: </td><td><?=ucfirst($emp_d['employee_gender'])?></td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 <?php
@@ -194,6 +211,10 @@
     function gotopage(){
         var value_sort = document.getElementById("sort_data").value;
         window.location.href = "<?php echo base_url('employee/sort/');?>/"+value_sort;
+    }
+    function OpenDetais(empid){
+        document.getElementById("details_emp"+empid).style.display = "block";
+
     }
 </script>
 </html>
